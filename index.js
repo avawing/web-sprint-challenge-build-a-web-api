@@ -5,11 +5,15 @@ const helmet = require("helmet");
 const projectDb = require("./data/helpers/projectModel");
 const actionsDb = require("./data/helpers/actionModel");
 
+const actionsRoute = require("./actionRoute")
+
 const server = express();
 
 server.use(express.json());
 server.use("/", morgan("tiny"));
 server.use("/", helmet());
+
+server.use("/actions", actionsRoute)
 
 server.get("/", (req, res, next) => {
   res.send("Hi");
@@ -23,15 +27,7 @@ server.get("/projects/:id", (req, res, next) => {
   });
 });
 
-server.get("actions/:id", (req, res, next) => {
-  actionsDb
-    .get(req.params.id)
-    .then((action) =>
-      action
-        ? res.status(200).json(action)
-        : res.status(404).json({ message: "Action not found" }).end()
-    );
-});
+
 
 server.post("/projects", (req, res, next) => {
   projectDb
@@ -73,19 +69,7 @@ server.put("/projects/:id", (req, res, next) => {
   });
 });
 
-server.put("actions/:id", (req, res, next) => {
-  actionsDb.get(req.params.id).then((result) => {
-    result
-      ? actionsDb
-          .update(req.params.id, req.body)
-          .then((response) =>
-            response
-              ? res.status(200).json(response).end()
-              : res.status(500).json({ message: "Unable to update" }).end()
-          )
-      : res.status(404).json({ message: "action not found" }).end();
-  });
-});
+
 
 server.delete('/projects/:id',(req, res, next)=>{
     projectDb.get(req.params.id).then((result) => {
@@ -101,19 +85,7 @@ server.delete('/projects/:id',(req, res, next)=>{
       });
 })
 
-server.delete('/actions/:id',(req, res, next)=>{
-    actionsDb.get(req.params.id).then((result) => {
-        result
-          ? actionsDb
-              .remove(req.params.id)
-              .then((result) =>
-                result === 1
-                  ? res.status(204).json({message: "Item removed"}).end()
-                  : res.status(500).json({ message: "Something went wrong" }).end()
-              )
-          : res.status(404).json({ message: "Not Found" }).end();
-      });
-})
+
 const port = process.env.PORT || 5000;
 
 server.listen(port, () => console.log(`server is listening on ${port}`));
