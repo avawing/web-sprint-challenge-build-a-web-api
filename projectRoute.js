@@ -1,13 +1,14 @@
 const express = require("express");
-const projectDb = require("./data/helpers/actionModel");
+const projectDb = require("./data/helpers/projectModel");
 const actionsDb = require("./data/helpers/actionModel");
 const projectRouter = express.Router();
 
 function validateId(req, res, next) {
   projectDb
     .get(req.params.id)
-    .then(next())
-    .catch((e) => res.status(404).json({ message: "Not Found" }).end());
+    .then( item => next())
+    .catch((e) => res.status(404).json({ message: "Not Found" }).end())
+    return
 }
 function validateProject(req, res, next) {
   if (req.body.name === "" || req.body.description === "") {
@@ -18,6 +19,7 @@ function validateProject(req, res, next) {
   } else {
     next();
   }
+  return
 }
 
 projectRouter.get("/:id", validateId, (req, res, next) => {

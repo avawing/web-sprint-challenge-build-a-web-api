@@ -3,18 +3,22 @@ const actionsDb = require("./data/helpers/actionModel");
 const actionRouter = express.Router();
 
 function validateId(req, res, next) {
-  actionsDb.Db.get(req.params.id)
-    .then((result) => next())
-    .catch((err) => res.status(404).json({ message: "Action not found" }))
-    .end();
+  actionsDb
+    .get(req.params.id)
+    .then((result) => next(result))
+    .catch((err) =>
+      res.status(404).json({ message: "Action not found" }).end()
+    );
+  return;
 }
 
 actionRouter.get("/:id", validateId, (req, res, next) => {
   actionsDb
     .get(req.params.id)
     .then((action) => res.status(200).json(action).end())
-    .catch((err) => res.status(500).json({ message: "Server fucked up" }))
-    .end();
+    .catch((err) =>
+      res.status(500).json({ message: "Server fucked up" }).end()
+    );
 });
 
 actionRouter.put("/:id", validateId, (req, res, next) => {
