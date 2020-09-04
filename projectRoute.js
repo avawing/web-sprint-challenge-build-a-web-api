@@ -20,32 +20,45 @@ projectRouter.get("/:id", validateId, (req, res, next) => {
 });
 
 projectRouter.post("/", (req, res, next) => {
+  if(req.body.name === '' || req.body.description === ''){
+    res.status(400).json({message: "Please fill out all required fields"})
+  } else {
   projectDb
     .insert(req.body)
     .then((response) => res.status(201).json(response).end())
     .catch((e) =>
       res.status(500).json({ message: "There was an error" }).end()
-    );
+    )}
 });
 
 projectRouter.post("/:id/actions", validateId, (req, res, next) => {
   const actions = req.body;
   actions.project_id = req.params.id;
-  actionsDb
+  actions.completed = false;
+  if(actions.name === '' || actions.notes === ''){
+    res.status(400).json({message: "Please fill out all required fields"})
+  } else {
+    actionsDb
     .insert(actions)
     .then((action) => res.status(201).json(action).end())
     .catch((e) =>
       res.status(500).json({ message: "There was a problem" }).end()
-    );
+    )
+  }
+;
 });
 
 projectRouter.put("/:id", validateId, (req, res, next) => {
+  if(req.body.name === '' || req.body.description === ''){
+    res.status(400).json({message: "Please fill out all required fields"})
+  } else {
   projectDb
     .update(req.params.id, req.body)
     .then((result) => res.status(201).json(result).end())
     .catch((e) =>
       res.status(500).json({ message: "Something went wrong" }).end()
-    );
+    )
+  }
 });
 
 projectRouter.delete("/:id", validateId, (req, res, next) => {
