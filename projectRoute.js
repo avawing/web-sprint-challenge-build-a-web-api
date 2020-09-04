@@ -6,9 +6,9 @@ const projectRouter = express.Router();
 function validateId(req, res, next) {
   projectDb
     .get(req.params.id)
-    .then( item => next())
-    .catch((e) => res.status(404).json({ message: "Not Found" }).end())
-    return
+    .then((item) => next())
+    .catch((e) => res.status(404).json({ message: "Not Found" }).end());
+  return;
 }
 function validateProject(req, res, next) {
   if (req.body.name === "" || req.body.description === "") {
@@ -19,12 +19,21 @@ function validateProject(req, res, next) {
   } else {
     next();
   }
-  return
+  return;
 }
 
 projectRouter.get("/:id", validateId, (req, res, next) => {
   projectDb
     .get(req.params.id)
+    .then((result) => {
+      res.status(200).json(result).end();
+    })
+    .catch((e) => res.status(500).json({ message: "something went wrong" }));
+});
+
+projectRouter.get("/:id/actions", validateId, (req, res, next) => {
+  projectDb
+    .getProjectActions(req.params.id)
     .then((result) => {
       res.status(200).json(result).end();
     })
