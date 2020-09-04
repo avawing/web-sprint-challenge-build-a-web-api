@@ -18,23 +18,19 @@ server.get("/", (req, res, next) => {
 server.get("/projects/:id", (req, res, next) => {
   projectDb.get(req.params.id).then((result) => {
     result
-      ? res.status(200).json(result)
-      : res.status(404).json({ message: "Not Found" });
+      ? res.status(200).json(result).end()
+      : res.status(404).json({ message: "Not Found" }).end();
   });
 });
 
-server.get("/projects/:p_id/actions/:a_id", (req, res, next) => {
-  projectDb.get(req.params.p_id).then((project) => {
-    project
-      ? actionsDb
-          .get(req.params.a_id)
+server.get("actions/:id", (req, res, next) => {
+  actionsDb
+          .get(req.params.id)
           .then((action) =>
             action
               ? res.status(200).json(action)
-              : res.status(404).json({ message: "Action not found" })
+              : res.status(404).json({ message: "Action not found" }).end()
           )
-      : res.status(404).json({ message: "Project not found" });
-  });
 });
 
 server.post("/projects", (req, res, next) => {
@@ -42,8 +38,8 @@ server.post("/projects", (req, res, next) => {
     .insert(req.body)
     .then((response) =>
       response
-        ? res.status(201).json(response)
-        : res.status(500).json({ message: "There was an error" })
+        ? res.status(201).json(response).end()
+        : res.status(500).json({ message: "There was an error" }).end()
     );
 });
 
@@ -56,12 +52,29 @@ server.post("/projects/:id/actions", (req, res, next) => {
           .insert(actions)
           .then((action) =>
             action
-              ? res.status(201).json(action)
-              : res.status(500).json({ message: "There was a problem" })
+              ? res.status(201).json(action).end()
+              : res.status(500).json({ message: "There was a problem" }).end()
           )
-      : res.status(404).json({ message: "Project not found" });
+      : res.status(404).json({ message: "Project not found" }).end();
   });
 });
+
+server.put("/projects/:id", (req, res, next)=>{
+    projectDb.get(req.params.id)
+    .then((result) => {
+        result
+          ? projectDb.update(req.params.id, req.body)
+          .then(result => result ? res.status(201).json(result).end() : res.status(500).json({message: "Something went wrong"}).end())
+          : res.status(404).json({ message: "Not Found" }).end();
+      });
+})
+
+server.put("actions/:id", (req, res, next)=>{
+actionsDb.get(req.params.id)
+.then(result => {
+    result ? actionsDb.update(req.params.id, req.body).then(response => response ? res.status(200).json(response).end() : res.status(500).json({message: "Unable to update"}).end()) : res.status(404).json({message: "action not found"}).end()
+})
+})
 
 const port = process.env.PORT || 5000;
 
