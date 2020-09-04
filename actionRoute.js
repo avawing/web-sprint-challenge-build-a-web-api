@@ -34,18 +34,13 @@ actionRouter.put("/:id", validateId, (req, res, next) => {
   }
 });
 
-actionRouter.delete("/:id", (req, res, next) => {
-  actionsDb.get(req.params.id).then((result) => {
-    result
-      ? actionsDb
-          .remove(req.params.id)
-          .then((result) =>
-            result === 1
-              ? res.status(204).json({ message: "Item removed" }).end()
-              : res.status(500).json({ message: "Something went wrong" }).end()
-          )
-      : res.status(404).json({ message: "Not Found" }).end();
-  });
+actionRouter.delete("/:id", validateId, (req, res, next) => {
+  actionsDb
+    .remove(req.params.id)
+    .then((result) => res.status(204).json({ message: "Item removed" }).end())
+    .catch((err) =>
+      res.status(500).json({ message: "Something went wrong" }).end()
+    );
 });
 
 module.exports = actionRouter;
